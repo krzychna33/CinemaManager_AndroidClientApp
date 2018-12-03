@@ -11,7 +11,9 @@ It is schoolarship project.
 "Owner of fiction cinema called "XD CINEMA" needs seats reservation system.
 Project contains:
     1. API - backend,
+
     2. Admin web panel for cinema staff, where employees can create and update showings,
+    
     3. Mobile andorid app where clients can make reservations"
 
 ### CinemaApp includes 3 elements:
