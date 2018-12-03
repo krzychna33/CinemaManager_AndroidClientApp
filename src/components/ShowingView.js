@@ -1,12 +1,13 @@
 import React from 'react';
-import { 
+import {
     View,
     Text,
     StyleSheet,
     ScrollView,
     TouchableHighlight,
-    Button 
+    Button
 } from 'react-native';
+import moment from 'moment';
 import axiosInstance from '../utils/axios';
 
 export default class ShowingView extends React.Component {
@@ -17,21 +18,22 @@ export default class ShowingView extends React.Component {
             id: props.navigation.getParam('id', undefined),
             showing: {},
             cinemaMap: [],
-            seatsSelectedByUser: []
+            seatsSelectedByUser: [],
+            errors: ''
         }
     }
 
     componentDidMount() {
         this._isMounted = true;
         axiosInstance.get(`/showings-unauthenticated/${this.state.id}`).then((res) => {
-            if(this._isMounted && res.status === 200){
-                this.setState(() => ({showing: res.data.data}))
+            if (this._isMounted && res.status === 200) {
+                this.setState(() => ({ showing: res.data.data }))
                 this.mapCinema();
             }
         })
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         this._isMounted = false;
     }
 
@@ -39,16 +41,16 @@ export default class ShowingView extends React.Component {
         let cinemaMap = [];
         const reservations = this.state.showing.reservations; //This nested for-loops makes me crying, i will repair this some time, I promise.
         let iterator = 0;
-        for(let i=1; i<=16; i++){
-            for(let j=1; j<=14; j++){
+        for (let i = 1; i <= 16; i++) {
+            for (let j = 1; j <= 14; j++) {
                 let isFree = true;
-                for(let k=0; k<reservations.length; k++){
-                    if(reservations[k].row == i && reservations[k].seat == j){
+                for (let k = 0; k < reservations.length; k++) {
+                    if (reservations[k].row == i && reservations[k].seat == j) {
                         isFree = false;
                         break;
                     }
                 }
-                if(isFree){
+                if (isFree) {
                     cinemaMap.push({
                         seat: j,
                         row: i,
@@ -69,17 +71,12 @@ export default class ShowingView extends React.Component {
                 }
             }
         }
-        this.setState(() => ({cinemaMap}))
+        this.setState(() => ({ cinemaMap }))
     }
 
     onSeatPress = (key = 'test') => {
-        // let newSeat = {};
         const newCinemaMap = this.state.cinemaMap.map((seat) => {
-            if(seat.key == key){
-                // newSeat = {
-                //     seat: seat.seat,
-                //     row: seat.row
-                // }
+            if (seat.key == key) {
                 return {
                     ...seat,
                     selectedByUser: !seat.selectedByUser
@@ -87,30 +84,26 @@ export default class ShowingView extends React.Component {
             }
             return seat;
         })
-
-        this.setState(() => ({cinemaMap: newCinemaMap}));
-        // this.setState((old) => ({
-        //     seatsSelectedByUser: [
-        //         ...old.seatsSelectedByUser,
-        //         newSeat
-        //     ]
-        // }))
+        this.setState(() => ({ cinemaMap: newCinemaMap }));
     }
 
     onButtonPress = () => {
         const seatsSelectedByUser = this.state.cinemaMap.filter((seat) => {
-            if(seat.selectedByUser){
+            if (seat.selectedByUser) {
                 return {
                     seat: seat.seat,
                     row: seat.row
                 }
             }
         });
-        console.log(seatsSelectedByUser)
-        this.props.navigation.navigate('ReservationConfirm', {
-            seats: seatsSelectedByUser,
-            showingId: this.state.showing.id
-        });
+        if(seatsSelectedByUser.length == 0){
+            this.setState(() => ({error: 'You have to pick at least one seat.'}))
+        } else {
+            this.props.navigation.navigate('ReservationConfirm', {
+                seats: seatsSelectedByUser,
+                showingId: this.state.showing.id
+            });
+        }
     }
 
     render() {
@@ -118,40 +111,44 @@ export default class ShowingView extends React.Component {
 
         return (
             <ScrollView>
-                <Text>{this.state.showing.movieTitle}</Text>
-                <Text>{this.state.showing.showingTime}</Text>
+                <Text style={styles.boldText}>{this.state.showing.movieTitle}</Text>
+                <Text style={styles.boldText}>{moment(this.state.showing.showingTime).format('MMMM Do YYYY, kk:mm')}</Text>
                 <View style={styles.cinemaContainer}>
-                    <View style={styles.cinemaScreen}><Text style={{color: 'white'}}>Screen</Text></View>
+                    <View style={styles.cinemaScreen}><Text style={{ color: 'white' }}>Screen</Text></View>
                     <View style={styles.seatsContainer}>
-                    {
-                        this.state.cinemaMap.map((item, key) => {
-                            if(item.isFree){
-                                if(item.selectedByUser){
-                                    return (
-                                        <TouchableHighlight onPress={() => this.onSeatPress(key)} key={key} style={[styles.cinemaSeat, styles.seatSelectedByUser]}>
-                                            <Text>{item.text}</Text>
-                                        </TouchableHighlight>
-                                    )
+                        {
+                            this.state.cinemaMap.map((item, key) => {
+                                if (item.isFree) {
+                                    if (item.selectedByUser) {
+                                        return (
+                                            <TouchableHighlight onPress={() => this.onSeatPress(key)} key={key} style={[styles.cinemaSeat, styles.seatSelectedByUser]}>
+                                                <Text>{item.text}</Text>
+                                            </TouchableHighlight>
+                                        )
+                                    } else {
+                                        return (
+                                            <TouchableHighlight onPress={() => this.onSeatPress(key)} key={key} style={[styles.cinemaSeat, styles.freeSeat]}>
+                                                <Text>{item.text}</Text>
+                                            </TouchableHighlight>
+                                        )
+                                    }
+
                                 } else {
                                     return (
-                                    <TouchableHighlight onPress={() => this.onSeatPress(key)} key={key} style={[styles.cinemaSeat, styles.freeSeat]}>
-                                        <Text>{item.text}</Text>
-                                    </TouchableHighlight>
+                                        <View key={key} style={[styles.cinemaSeat, styles.takenSeat]}>
+                                            <Text>{item.text}</Text>
+                                        </View>
                                     )
                                 }
 
-                            } else {
-                                return (
-                                    <View key={key} style={[styles.cinemaSeat, styles.takenSeat]}>
-                                        <Text>{item.text}</Text>
-                                    </View>
-                                )
-                            }
-                            
-                        })
-                    }
+                            })
+                        }
                     </View>
                 </View>
+
+                {
+                    this.state.error && <Text style={styles.error}>{this.state.error}</Text>
+                }
 
                 <Button
                     title="Make reservation"
@@ -181,9 +178,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     cinemaSeat: {
-        width: `${84/14}%`,
+        width: `${84 / 14}%`,
         height: 20,
-        margin: `${16/28}%`
+        margin: `${16 / 28}%`
     },
     cinemaScreen: {
         display: 'flex',
@@ -198,5 +195,13 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
+    },
+    boldText: {
+        fontWeight: 'bold'
+    },
+    error: {
+        textAlign: 'center',
+        color: 'red',
+        fontWeight: 'bold'
     }
 })

@@ -30,18 +30,26 @@ class ShowingsScreen extends React.Component {
     render() {
         return (
             <View>
-                <Text>It is a ShowingScreen</Text>
+                <Text style={styles.header}>Currently played:</Text>
                 {
                     this.state.showingsGot ? (
-                        <ShowingsList navigation={this.props.navigation}/>
+                        <ShowingsList navigation={this.props.navigation} />
                     ) : (
-                        <Text>Fetching data from server. Please wait...</Text>
-                    )
+                            <Text>Fetching data from server. Please wait...</Text>
+                        )
                 }
             </View>
         )
     }
 }
+
+const styles = StyleSheet.create({
+    header: {
+        textAlign: 'center',
+        fontSize: 18,
+        marginBottom: 20
+    }
+})
 
 const mapDispatchToProps = (dispatch) => {
     return {
@@ -50,3 +58,4 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 export default connect(undefined, mapDispatchToProps)(ShowingsScreen);
+

@@ -3,6 +3,7 @@ import { ScrollView, Text } from 'react-native';
 import { connect } from 'react-redux';
 
 import ShowingItem from './ShowingItem';
+import showingsSelector from '../selectors/showings';
 
 class ShowingsList extends React.Component {
 
@@ -26,7 +27,7 @@ class ShowingsList extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        showings: state.showings
+        showings: showingsSelector(state.showings)
     }
 }
 

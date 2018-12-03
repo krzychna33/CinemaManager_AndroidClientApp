@@ -33,7 +33,6 @@ export class WelcomeScreen extends React.Component {
                             onChangeText={this.onEmailChange}
                         />
                         <Button
-                            style={styles.button}
                             title="Continue"
                             onPress={this.onButtonPress}
                         />
@@ -75,9 +74,6 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    button: {
-        margin: 60
     }
 });
 

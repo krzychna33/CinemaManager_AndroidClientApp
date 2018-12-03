@@ -7,6 +7,7 @@ import ShowingsScreen from './src/components/ShowingsScreen';
 import configureStore from './src/store/configureStore';
 import ShowingView from './src/components/ShowingView';
 import ReservationConfirm from './src/components/ReservationConfirm';
+import SuccessScreen from './src/components/SuccessScreen';
 
 console.log(process.env.TEST);
 console.log('RUNNING NATIVE APP...')
@@ -14,7 +15,7 @@ console.log('RUNNING NATIVE APP...')
 const store = configureStore();
 
 
-const AppNavigator = createStackNavigator({
+const MainAppNavigator = createStackNavigator({
   WelcomeScreen: {
     screen: WelcomeScreen
   },
@@ -29,7 +30,23 @@ const AppNavigator = createStackNavigator({
   }
 });
 
-const AppContainer = createAppContainer(AppNavigator);
+const RootAppNavigator = createStackNavigator(
+  {
+    Main: {
+      screen: MainAppNavigator
+    },
+    SuccessScreen: {
+      screen: SuccessScreen
+    }
+  },
+    {
+      mode: 'modal',
+      headerMode: 'none',
+    }
+);
+
+
+const AppContainer = createAppContainer(RootAppNavigator);
 
 export default class App extends React.Component {
   render(){
