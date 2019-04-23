@@ -6,10 +6,10 @@
 ## It is an app for learning purpouses. It is a system for seats reservation in cinema (Like a cinemacity app). This repo contains only andorid app for cinema clients where people can make reservations for showings.
 
 Android app featues:
-..* client can browse showings
-..* client can select seats and make reservation
-..* client will get an e-mail with confirmation
-..* in e-mail, he gets will be special link to cancel reservation
+* client can browse showings
+* client can select seats and make reservation
+* client will get an e-mail with confirmation
+* in e-mail, he gets will be special link to cancel reservation
 
 
 I know, this project has some bugs and some things could be better. Well... it is my first android app ever 😎. Please keep in mind that, the main idea of this was to learn react-native and redux framework. Cheers! :) 👌😄
